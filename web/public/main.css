@@ -1,0 +1,126 @@
+.hidden { display: none; }
+
+body {
+  max-width: 720px;
+  margin: 0 auto 60px;
+  background: #f5f5f5;
+  font-family: sans-serif;
+}
+
+h1 {
+  text-align: center;
+  font-weight: normal;
+  line-height: 4.5rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.score-list {
+  font-size: 1.5rem;
+  line-height: 2.5rem;
+  margin: 30px 30px 0 100px;
+  padding: 0;
+}
+.score-list li {
+  position: relative;
+  padding: 10px;
+  cursor: pointer;
+  list-style-position: inside;
+}
+.score-list .active {
+  background: #ccc;
+  border-radius: 3px;
+}
+.score-list .name {
+}
+.score-list .score {
+  float: right;
+}
+.score-list .active .control{
+  visibility: visible;
+}
+.score-list .control {
+  visibility: hidden;
+  float: right;
+  margin-left: 10px;
+  margin-top: 4px;
+  background: #eee;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  height: 30px;
+  width: 30px;
+}
+
+.score-list .increment {
+}
+
+.score-list .increment span {
+  position: relative;
+  display: block;
+  top: 17px;
+  background: #88b7d5;
+  font-size: 0;
+  width: 8px;
+  height: 8px;
+  left: 11px;
+  transition: top 0.3s;
+}
+
+.score-insert-player button:hover,
+.score-list .control:hover {
+  background: #f5f5f5;
+}
+.score-insert-player button:active,
+.score-list .control:active {
+  background: #fff;
+}
+
+
+.score-list .increment:hover span {
+  top: 14px;
+}
+.score-list .increment:active span {
+  top: 19px;
+}
+.score-list .increment span:after {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  border-color: rgba(136, 183, 213, 0);
+  border-bottom-color: #88b7d5;
+  border-width: 10px;
+  margin-left: -10px;
+}
+
+.score-list .delete {
+  text-align: center;
+  line-height: 1.9rem;
+  font-size: 2.4rem;
+  color: #900;
+}
+
+.score-insert-player {
+  padding: 20px 140px 0 130px;
+  position: relative;
+}
+.score-insert-player input {
+  font-size: 1.5rem;
+  line-height: 2.5rem;
+  padding: 0 5px;
+  width: 100%;
+}
+.score-insert-player button {
+  position: absolute;
+  top: 22px;
+  right: 39px;
+  background: #eee;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  cursor: pointer;
+  width: 72px;
+  font-size: 1.2rem;
+  height: 2.5rem;
+}
