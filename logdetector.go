@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	"database/sql"
@@ -13,13 +14,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const MYFILE = "/somepath/logfile.log"
-const READ_BUFFER_LIMIT = 2048
+const MYFILE = "C:/workspace_new/rec-file-checker/log/20190129.log"
+const READ_BUFFER_LIMIT = 512
 const FIND_KEYWORD = "ERROR"
 
 var CONTROL = "" // make(chan string)
 
 func main() {
+	match, _ := regexp.MatchString(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}`, "2019-01-29 13:01:43")
+	log.Println("match: ", match)
 
 	watcher, err := fsnotify.NewWatcher()
 
@@ -70,6 +73,7 @@ func readFile(fname string) {
 	buf := make([]byte, READ_BUFFER_LIMIT)
 	stat, err := os.Stat(fname)
 	start := stat.Size() - READ_BUFFER_LIMIT
+
 	_, err = file.ReadAt(buf, start)
 
 	if err == nil {
@@ -77,15 +81,17 @@ func readFile(fname string) {
 
 			strBuf := string(buf[:])
 			findStr := findKeywordUsingSplit(strBuf, FIND_KEYWORD)
-			tmp := findStr[0:19]
+			// fmt.Printf("[%s]\n", findStr)
+			tmp := findStr[0:23]
 
 			if tmp != CONTROL {
-				CONTROL = findStr[0:19]
+
+				CONTROL = findStr[0:23]
 				fmt.Println("start-----------------------------------------------")
 				fmt.Printf("%s\n", buf)
 				fmt.Println("end-------------------------------------------------")
 
-				db, err := sql.Open("mysql", "root:passwd@tcp(127.0.0.1:3306)/test")
+				db, err := sql.Open("mysql", "root:!QAZ2wsx@tcp(127.0.0.1:3306)/test")
 				if err != nil {
 					log.Fatal(err)
 				}
