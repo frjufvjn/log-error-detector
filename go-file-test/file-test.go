@@ -16,6 +16,12 @@ func check(e error) {
 	}
 }
 
+/*
+Ref.
+	http://pyrasis.com/book/GoForTheReallyImpatient/Unit50/05
+	https://gobyexample.com/reading-files
+*/
+
 func main() {
 	dat, err := ioutil.ReadFile(FILENAME)
 	check(err)
