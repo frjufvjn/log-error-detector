@@ -22,8 +22,9 @@ const (
 )
 
 var (
-	sizeChk int64 = 0
-	sizeMap sync.Map
+	sizeChk  int64 = 0
+	sizeMap  sync.Map
+	patterns []string
 )
 
 // var CONTROL = "" // make(chan string)
@@ -38,6 +39,7 @@ func main() {
 	log.Println("match: ", match)
 
 	logs := getConfig("logfile")
+	patterns = getConfig("pattern")
 
 	watcher, err := fsnotify.NewWatcher()
 
@@ -106,8 +108,6 @@ func readFile(fname string) {
 
 	// file read
 	reader := bufio.NewReader(file)
-
-	patterns := getConfig("pattern")
 
 	if beforeSize > 0 {
 		n := 1
