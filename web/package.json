@@ -1,7 +1,7 @@
 {
-  "name": "mysql-example",
+  "name": "log-error-detector",
   "version": "1.1.0",
-  "description": "Example showing reactive MySQL",
+  "description": "golang log error detector & nodejs RTC UI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -13,7 +13,7 @@
     "sockets",
     "reactive"
   ],
-  "author": "Ben Green <ben@latenightsketches.com> (http://github.com/numtel)",
+  "author": "Park Jeong Woo (frjufvjn@gmail.com)",
   "license": "MIT",
   "dependencies": {
     "express": "^4.13.3",

@@ -10,7 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
-	"sync/atomic"
+	"sync"
 
 	"github.com/fsnotify/fsnotify"
 	_ "github.com/go-sql-driver/mysql"
@@ -23,17 +23,20 @@ const (
 )
 
 var sizeChk int64 = 0
+var sizeMap sync.Map
 
 // var CONTROL = "" // make(chan string)
 
 type Configuration struct {
 	Patterns []string
-	LogFile  []string
+	Logfiles []string
 }
 
 func main() {
 	match, _ := regexp.MatchString(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}`, "2019-01-29 13:01:43")
 	log.Println("match: ", match)
+
+	logs := getConfig("logfile")
 
 	watcher, err := fsnotify.NewWatcher()
 
@@ -51,7 +54,7 @@ func main() {
 			case event := <-watcher.Events:
 
 				if event.Op&fsnotify.Write == fsnotify.Write {
-					readFile(MYFILE)
+					readFile(event.Name)
 				}
 
 			case err := <-watcher.Errors:
@@ -61,11 +64,13 @@ func main() {
 		}
 	}()
 
-	err = watcher.Add(MYFILE)
-
-	if err != nil {
-		log.Fatal(err)
+	for idx := range logs {
+		err := watcher.Add(logs[idx])
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+
 	<-done
 
 }
@@ -77,12 +82,20 @@ func readFile(fname string) {
 	defer file.Close()
 
 	// get previous file size (avoid race condition)
-	beforeSize := atomic.LoadInt64(&sizeChk)
+	// [GET]beforeSize := atomic.LoadInt64(&sizeChk)
+	var beforeSize int64
+	res, ok := sizeMap.Load(fname)
+	if ok {
+		beforeSize = res.(int64)
+	} else {
+		beforeSize = 0
+	}
 
 	// get current file size
 	stat, err := os.Stat(fname)
 	checkFileErr(err)
-	atomic.StoreInt64(&sizeChk, stat.Size())
+	// [SET]atomic.StoreInt64(&sizeChk, stat.Size())
+	sizeMap.Store(fname, stat.Size())
 
 	// log.Println("[DEBUG] sizeChk, beforeSize :", sizeChk, beforeSize)
 
@@ -93,7 +106,7 @@ func readFile(fname string) {
 	// file read
 	reader := bufio.NewReader(file)
 
-	patterns := getPatterns()
+	patterns := getConfig("pattern")
 
 	n := 1
 	for n < MAX_READ_LINE {
@@ -132,7 +145,7 @@ func readFile(fname string) {
 	}
 }
 
-func getPatterns() []string {
+func getConfig(key string) []string {
 	// from json file
 	file, err := os.Open("conf.json")
 	if err != nil {
@@ -147,7 +160,11 @@ func getPatterns() []string {
 		panic(decErr)
 	}
 
-	return configuration.Patterns
+	if key == "pattern" {
+		return configuration.Patterns
+	} else {
+		return configuration.Logfiles
+	}
 }
 
 func checkFileErr(e error) {
