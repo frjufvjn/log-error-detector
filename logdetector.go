@@ -20,7 +20,6 @@ const (
 	MYFILE            = "C:/workspace_new/simple-db-migration/log/20190131.log"
 	MAX_READ_LINE     = 100
 	READ_BUFFER_LIMIT = 512
-	FIND_KEYWORD      = "ERROR"
 )
 
 var sizeChk int64 = 0
@@ -124,7 +123,7 @@ func readFile(fname string) {
 				dbCheckError(err)
 				defer stmt.Close()
 
-				_, err = stmt.Exec(FIND_KEYWORD, string(line))
+				_, err = stmt.Exec(patterns[idx], string(line))
 				dbCheckError(err)
 			}
 		}
@@ -149,10 +148,6 @@ func getPatterns() []string {
 	}
 
 	return configuration.Patterns
-	// fmt.Println(configuration.Patterns)
-	// for idx := range configuration.Patterns {
-	// 	fmt.Println(configuration.Patterns[idx])
-	// }
 }
 
 func checkFileErr(e error) {
