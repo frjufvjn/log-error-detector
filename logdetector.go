@@ -107,40 +107,42 @@ func readFile(fname string) {
 
 	patterns := getConfig("pattern")
 
-	n := 1
-	for n < MAX_READ_LINE {
-		line, _, err := reader.ReadLine()
-		if err != nil {
-			break
-		}
-
-		// TODO 라인의 처음부분에 시간정보가 있는것을 regexp 로 걸른다.
-		// TODO Throttling Logic 추가 구현
-
-		// find patterns from config file
-		for idx := range patterns {
-
-			// Detect keyword from log line
-			if beforeSize != 0 && bytes.Contains(line, []byte(patterns[idx])) {
-				fmt.Printf("DETECTED--> %s\n", string(line))
-
-				// mysql db insert
-				db, err := sql.Open("mysql", "root:!QAZ2wsx@tcp(127.0.0.1:3306)/test")
-				if err != nil {
-					log.Fatal(err)
-				}
-				defer db.Close()
-
-				stmt, err := db.Prepare("INSERT INTO log_detect (category,content) values (?, ?)")
-				checkFileErr(err)
-				defer stmt.Close()
-
-				_, err = stmt.Exec(patterns[idx], string(line))
-				checkFileErr(err)
+	if beforeSize > 0 {
+		n := 1
+		for n < MAX_READ_LINE {
+			line, _, err := reader.ReadLine()
+			if err != nil {
+				break
 			}
-		}
 
-		n++
+			// TODO 라인의 처음부분에 시간정보가 있는것을 regexp 로 걸른다.
+			// TODO Throttling Logic 추가 구현
+
+			// find patterns from config file
+			for idx := range patterns {
+
+				// Detect keyword from log line
+				if bytes.Contains(line, []byte(patterns[idx])) {
+					fmt.Printf("DETECTED--> %s\n", string(line))
+
+					// mysql db insert
+					db, err := sql.Open("mysql", "root:!QAZ2wsx@tcp(127.0.0.1:3306)/test")
+					if err != nil {
+						log.Fatal(err)
+					}
+					defer db.Close()
+
+					stmt, err := db.Prepare("INSERT INTO log_detect (category,content) values (?, ?)")
+					checkFileErr(err)
+					defer stmt.Close()
+
+					_, err = stmt.Exec(patterns[idx], string(line))
+					checkFileErr(err)
+				}
+			}
+
+			n++
+		}
 	}
 }
 
