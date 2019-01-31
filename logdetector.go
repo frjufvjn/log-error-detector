@@ -17,9 +17,8 @@ import (
 )
 
 const (
-	MYFILE            = "C:/workspace_new/simple-db-migration/log/20190131.log"
 	MAX_READ_LINE     = 100
-	READ_BUFFER_LIMIT = 512
+	READ_BUFFER_LIMIT = 1024
 )
 
 var sizeChk int64 = 0
@@ -133,11 +132,11 @@ func readFile(fname string) {
 				defer db.Close()
 
 				stmt, err := db.Prepare("INSERT INTO log_detect (category,content) values (?, ?)")
-				dbCheckError(err)
+				checkFileErr(err)
 				defer stmt.Close()
 
 				_, err = stmt.Exec(patterns[idx], string(line))
-				dbCheckError(err)
+				checkFileErr(err)
 			}
 		}
 
@@ -170,12 +169,6 @@ func getConfig(key string) []string {
 func checkFileErr(e error) {
 	if e != nil {
 		panic(e)
-	}
-}
-
-func dbCheckError(err error) {
-	if err != nil {
-		panic(err)
 	}
 }
 
