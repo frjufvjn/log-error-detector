@@ -1,0 +1,8 @@
+CREATE TABLE `log_detect` (
+	`category` VARCHAR(200) NULL DEFAULT NULL,
+	`content` VARCHAR(5000) NULL DEFAULT NULL,
+	`creation_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;

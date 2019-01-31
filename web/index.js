@@ -18,7 +18,7 @@ var sock = sockjs.createServer(sockOptions);
 var connected = [];
 
 var searchSql = `
-SELECT category 
+SELECT category, content
 FROM log_detect
 WHERE creation_date BETWEEN DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00') 
   AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59')

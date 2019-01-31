@@ -1,0 +1,14 @@
+{
+    "patterns": [
+        "FATAL",
+        "ERROR",
+        "DEBUG",
+        "EXCEPTION",
+        "SHUTDOWN",
+        "CHANNEL_STOP"
+    ],
+    "log-files": [
+        "C:/workspace_new/simple-db-migration/log/20190131.log",
+        "C:/workspace_new/simple-db-migration/log/20190130.log"
+    ]
+}
