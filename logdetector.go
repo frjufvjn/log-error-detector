@@ -21,8 +21,10 @@ const (
 	READ_BUFFER_LIMIT = 1024
 )
 
-var sizeChk int64 = 0
-var sizeMap sync.Map
+var (
+	sizeChk int64 = 0
+	sizeMap sync.Map
+)
 
 // var CONTROL = "" // make(chan string)
 
