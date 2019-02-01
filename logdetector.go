@@ -16,22 +16,18 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const (
-	MAX_READ_LINE     = 100
-	READ_BUFFER_LIMIT = 1024
-)
-
 var (
-	sizeChk  int64 = 0
-	sizeMap  sync.Map
-	patterns []string
+	sizeMap     sync.Map
+	patterns    []string
+	maxReadLine int = 100
 )
 
 // var CONTROL = "" // make(chan string)
 
 type Configuration struct {
-	Patterns []string
-	Logfiles []string
+	Patterns    []string
+	Logfiles    []string
+	Maxreadline int
 }
 
 func main() {
@@ -40,13 +36,12 @@ func main() {
 
 	logs := getConfig("logfile")
 	patterns = getConfig("pattern")
+	maxReadLine = getConfigMaxReadLine()
 
 	watcher, err := fsnotify.NewWatcher()
-
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer watcher.Close()
 
 	done := make(chan bool)
@@ -81,7 +76,7 @@ func main() {
 func readFile(fname string) {
 	// file open
 	file, err := os.Open(fname)
-	checkFileErr(err)
+	checkError(err)
 	defer file.Close()
 
 	// get previous file size (avoid race condition)
@@ -96,7 +91,7 @@ func readFile(fname string) {
 
 	// get current file size
 	stat, err := os.Stat(fname)
-	checkFileErr(err)
+	checkError(err)
 	// [SET]atomic.StoreInt64(&sizeChk, stat.Size())
 	sizeMap.Store(fname, stat.Size())
 
@@ -104,14 +99,14 @@ func readFile(fname string) {
 
 	// file seek to
 	_, err = file.Seek(beforeSize, 0)
-	checkFileErr(err)
+	checkError(err)
 
 	// file read
 	reader := bufio.NewReader(file)
 
 	if beforeSize > 0 {
 		n := 1
-		for n < MAX_READ_LINE {
+		for n < maxReadLine {
 			line, _, err := reader.ReadLine()
 			if err != nil {
 				break
@@ -135,11 +130,11 @@ func readFile(fname string) {
 					defer db.Close()
 
 					stmt, err := db.Prepare("INSERT INTO log_detect (category,content) values (?, ?)")
-					checkFileErr(err)
+					checkError(err)
 					defer stmt.Close()
 
 					_, err = stmt.Exec(patterns[idx], string(line))
-					checkFileErr(err)
+					checkError(err)
 				}
 			}
 
@@ -149,6 +144,18 @@ func readFile(fname string) {
 }
 
 func getConfig(key string) []string {
+	if key == "pattern" {
+		return getConfigInner().Patterns
+	} else {
+		return getConfigInner().Logfiles
+	}
+}
+
+func getConfigMaxReadLine() int {
+	return getConfigInner().Maxreadline
+}
+
+func getConfigInner() Configuration {
 	// from json file
 	file, err := os.Open("conf.json")
 	if err != nil {
@@ -163,14 +170,10 @@ func getConfig(key string) []string {
 		panic(decErr)
 	}
 
-	if key == "pattern" {
-		return configuration.Patterns
-	} else {
-		return configuration.Logfiles
-	}
+	return configuration
 }
 
-func checkFileErr(e error) {
+func checkError(e error) {
 	if e != nil {
 		panic(e)
 	}
@@ -208,50 +211,3 @@ func indexOf(slice []string, item string) int {
 	}
 	return -1
 }
-
-// func readFileOld(fname string) {
-
-// 	file, err := os.Open(fname)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer file.Close()
-
-// 	buf := make([]byte, READ_BUFFER_LIMIT)
-// 	stat, err := os.Stat(fname)
-// 	start := stat.Size() - READ_BUFFER_LIMIT
-
-// 	_, err = file.ReadAt(buf, start)
-
-// 	if err == nil {
-// 		if bytes.Contains(buf, []byte(FIND_KEYWORD)) {
-
-// 			strBuf := string(buf[:])
-// 			findStr := findKeywordUsingSplit(strBuf, FIND_KEYWORD)
-// 			// fmt.Printf("[%s]\n", findStr)
-// 			tmp := findStr[0:23]
-
-// 			if tmp != CONTROL {
-
-// 				CONTROL = findStr[0:23]
-// 				fmt.Println("start-----------------------------------------------")
-// 				fmt.Printf("%s\n", buf)
-// 				fmt.Println("end-------------------------------------------------")
-
-// 				db, err := sql.Open("mysql", "root:!QAZ2wsx@tcp(127.0.0.1:3306)/test")
-// 				if err != nil {
-// 					log.Fatal(err)
-// 				}
-// 				defer db.Close()
-
-// 				stmt, err := db.Prepare("INSERT INTO log_detect (category,content) values (?, ?)")
-// 				dbCheckError(err)
-// 				defer stmt.Close()
-
-// 				_, err = stmt.Exec(tmp, strBuf)
-// 				dbCheckError(err)
-// 			}
-// 		}
-// 	}
-// }
