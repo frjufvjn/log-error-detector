@@ -5,10 +5,10 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -28,9 +28,16 @@ type Configuration struct {
 	Patterns    []string
 	Logfiles    []string
 	Maxreadline int
+	Ismulticore bool
 }
 
 func main() {
+	useMultiCore := getConfigInner().Ismulticore
+	if useMultiCore {
+		runtime.GOMAXPROCS(runtime.NumCPU())                                            // CPU 개수를 구한 뒤 사용할 최대 CPU 개수 설정
+		log.Println("Use Multi Core: ", useMultiCore, ", CPU: ", runtime.GOMAXPROCS(0)) // 설정 값 출력
+	}
+
 	match, _ := regexp.MatchString(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}`, "2019-01-29 13:01:43")
 	log.Println("match: ", match)
 
@@ -120,7 +127,7 @@ func readFile(fname string) {
 
 				// Detect keyword from log line
 				if bytes.Contains(line, []byte(patterns[idx])) {
-					fmt.Printf("DETECTED--> %s\n", string(line))
+					log.Println("DETECTED...")
 
 					// mysql db insert
 					db, err := sql.Open("mysql", "root:!QAZ2wsx@tcp(127.0.0.1:3306)/test")

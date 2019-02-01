@@ -19,7 +19,7 @@ vim conf.json
 npm start
 ```
 ## UI 
-You can use mysql-live-select in nodejs to push the log history to the screen when an event occurs.
+You can use mysql-live-select in nodejs to push the log history to the screen when an event occurs. At the same time as the history is saved, the client or third party can give notification.
 
 * Ref: [mysql-live-select](https://github.com/numtel/mysql-live-select) - Provide events on `SELECT` statement result set updates
 

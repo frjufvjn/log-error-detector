@@ -8,10 +8,11 @@
         "CHANNEL_STOP"
     ],
     "logfiles": [
-        "C:/workspace_new/simple-db-migration/log/20190131.log",
-        "C:/workspace_new/simple-db-migration/log/20190130.log",
-        "C:/workspace_new/simple-db-migration/log/20190201.log",
-        "C:/workspace_new/simple-db-migration/log/test.log"
+        "C:/workspace_new/simple-db-migration/log/log1.log",
+        "C:/workspace_new/simple-db-migration/log/log2.log",
+        "C:/workspace_new/simple-db-migration/log/log3.log",
+        "C:/workspace_new/simple-db-migration/log/log4.log"
     ],
-    "maxreadline": 50
+    "maxreadline": 50,
+    "ismulticore": true
 }
