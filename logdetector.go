@@ -119,7 +119,6 @@ func readFile(fname string) {
 				break
 			}
 
-			// TODO 라인의 처음부분에 시간정보가 있는것을 regexp 로 걸른다.
 			// TODO Throttling Logic 추가 구현
 
 			// find patterns from config file
