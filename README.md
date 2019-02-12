@@ -13,6 +13,27 @@ npm install --save
 ```
 vim conf.json
 ```
+```
+{
+    // Register keywords to be detected
+    "patterns": [
+        "FATAL",
+        "ERROR",
+        "DEBUG"
+    ],
+    // Register log files path
+    "logfiles": [
+        "sompath/log/log1.log",
+        "sompath/log/log2.log",
+        "sompath/log/log3.log",
+        "sompath/log/log4.log"
+    ],
+    // The number of lines to read when reading the file
+    "maxreadline": 50,
+    // Use Multi Core
+    "ismulticore": true
+}
+```
 ### Run
 ```
 ./log-error-detector
